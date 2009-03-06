@@ -670,6 +670,7 @@ class ExportGcode(inkex.Effect):
                     if isinstance(line1, StraightLineSegment) and isinstance(line2,StraightLineSegment):
                         origin = calculateLineSegmentIntersectionPoint(line1,line2)
             if origin is not None:
+                logMessage("Found alternative origin")
                 self.origin = origin
             else:
                 logWarning("Origin must contain either one circle, or two intersecting straight lines")            
