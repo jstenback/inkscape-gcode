@@ -414,6 +414,12 @@ class PathElementReader(AbstractElementReader):
             currentPoint = None
         return returnPaths
 
+class NullElementReader(AbstractElementReader):
+    """Do nothing - useful for groups because the overall algorithm will
+    still iterate through children."""
+    def convertElementToPaths(self, element, coordinateTransformer):
+        return []
+
 class LineElementReader(AbstractElementReader):
     def convertElementToPaths(self, element, coordinateTransformer):
         assert element.tag == inkex.addNS("line","svg")
@@ -618,6 +624,7 @@ class ExportGcode(inkex.Effect):
         readers[inkex.addNS("path","svg")] = PathElementReader()
         readers[inkex.addNS("line","svg")] = LineElementReader()
         readers[inkex.addNS("rect","svg")] = RectElementReader()
+        readers[inkex.addNS("g","svg")] = NullElementReader()
         converters = []
         converters.append( BezierStraightLineConverter(self.options.machineTolerance) )
         
