@@ -860,7 +860,7 @@ class ExportGcode(inkex.Effect):
             description = self.describeCutPath(cutPath, "Path")
             for line in description:
                 mops.appendComment( line )
-                logMessage( line )
+                logDebug( line )
             if not self.millCutPath(cutList, cutPath, mops, traverseZ, cutZ, feedRate):
                 allPathsValid = False
         if self.options.returnToXYOrigin:
