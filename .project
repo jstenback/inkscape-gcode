@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>inkscape-gcode</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.python.pydev.PyDevBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.python.pydev.pythonNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>windows-inkscape-file-links/export_gcode.py</name>
+			<type>1</type>
+			<location>C:/Program Files/Inkscape/share/extensions/export_gcode.py</location>
+		</link>
+		<link>
+			<name>windows-inkscape-file-links/inkex.py</name>
+			<type>1</type>
+			<location>C:/Program Files/Inkscape/share/extensions/inkex.py</location>
+		</link>
+	</linkedResources>
+</projectDescription>

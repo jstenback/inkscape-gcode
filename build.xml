@@ -1,0 +1,50 @@
+<project name="inkscape-gcode" default="deploy" basedir=".">
+	<description>
+Simple build file to copy the working files into the Inkscape share/extension directory.
+	
+Note that this build file assumes a Windows OS, so can someone please clean this up for a unix 
+development environment.
+
+I would also like to add a target for packaging a release archive (maybe gz and zip).
+    </description>
+	<!-- set global properties for this build -->
+	<property name="src" location="src" />
+	<property name="inkscape-files" location="inkscape-files" />
+	<property name="inkscape" location="C:/Program Files/Inkscape" />
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+	</target>
+
+	<target name="deploy" depends="init" description="Copy the files to the inkscape share/extension directory">
+		<copy todir="${inkscape}/share/extensions">
+			<fileset dir="${src}">
+				<include name="export_gcode.py" />
+				<include name="export_gcode.inx" />
+				<include name="saveas_gcode.inx" />
+				<include name="biarc.py" />
+			</fileset>
+		</copy>
+	</target>
+	<target name="clean" depends="init" description="Deletes any .pyc files">
+		<delete>
+			<fileset dir="${src}" includes="*.pyc" />
+			<fileset dir="${inkscape-files}" includes="*.pyc" />
+		</delete>
+	</target>
+	<target name="freshen-inkscape-files" depends="init" description="Updates local copy of inkscape files">
+		<copy todir="{inkscape-files}">
+			<fileset dir="${inkscape}/share/extensions">
+				<include name="bezmisc.py" />
+				<include name="cubicsuperpath.py" />
+				<include name="inkex.py" />
+				<include name="simplepath.py" />
+				<include name="simplestyle.py" />
+				<include name="simpletransform.py" />
+			</fileset>
+		</copy>
+	</target>
+
+	
+</project>

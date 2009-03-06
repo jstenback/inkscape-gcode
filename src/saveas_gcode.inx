@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension>
+    <name>Export as GCODE</name>
+    <id>org.middlegable.gcode.inkscape.saveasgcode</id>
+	<dependency type="executable" location="extensions">export_gcode.py</dependency>
+	<dependency type="executable" location="extensions">inkex.py</dependency>
+	<dependency type="executable" location="extensions">simplestyle.py</dependency>
+	<dependency type="executable" location="extensions">simplepath.py</dependency>
+	<dependency type="executable" location="extensions">simpletransform.py</dependency>
+	<dependency type="executable" location="extensions">biarc.py</dependency>
+	  <param name="tab" type="notebook">  
+	    <page name="controls" _gui-text="Controls">
+	      <param 
+	      	name="machineTolerance" 
+	      	type="string" 
+	      	_gui-text="Effective resolution of the machine (in drawing units)">0.005</param>
+	      <param 
+	      	name="traverseZ" 
+	      	type="float" 
+	      	_gui-text="Z height for traverses (in drawing units)">1.0</param>
+	      <param 
+	      	name="defaultCutZ" 
+	      	type="float" 
+	      	_gui-text="Default Z height for cuts (in drawing units)">-1.0</param>
+	      <param 
+	      	name="defaultFeedRate" 
+	      	type="float" 
+	      	min="0.0" 
+	      	_gui-text="Default feed rate (in drawing units per minute)">1.0</param>
+	      <param 
+	      	name="returnToXYOrigin" 
+	      	type="boolean" 
+	      	_gui-text="Return to X0.0 Y0.0 at the end of the program (Z=traverseZ)">true</param>
+	      <param 
+	      	name="useCutVariables" 
+	      	type="boolean" 
+	      	_gui-text="Use variables for traverseZ, cutZ and feedRate">true</param>
+	      <param 
+	      	name="useScaleVariables" 
+	      	type="boolean" 
+	      	_gui-text="Use variables to scale X and Y dimensions">false</param>
+	    </page>
+	    <page name="help" _gui-text="Help">
+	      <param name="help_text" type="description">
+This extension will export EMC GCODE.  Not all object types can be converted, so look for error messages.
+
+If any objects are selected when this converter is run, only those selected objects will be exported.
+
+To help generate tool paths with meaningful names, group objects into layers, and name the layers in the format "ToolPath&lt;Id&gt; &lt;Options&gt;" where
+&lt;Id&gt; is some unique identifier, and &lt;Options&gt; are zero or more GCode options such as Z-5.0 (override defaultCutZ),
+F100.0 (override defaultFeedRate) or T1234 (select specific tool).  Each layer will create a separate GCode file named appropriately, and placed
+in the directory filenameBase.
+
+If no "ToolPath" layers are found, then all objects in the file will be exported to a single nc file.
+
+Note that if a layer named "Origin" is found, and contains either a single circle, or two intersecting lines, then
+that position will be used as the origin for the GCode (instead of Inkscape (0,0)). 
+			</param>
+	    </page>
+	  </param>
+    <output>
+        <extension>.nc</extension>
+        <mimetype>text/plain</mimetype>
+        <_filetypename>EMC G-Code (*.nc)</_filetypename>
+        <_filetypetooltip>Exports the paths of this document in G-Code format</_filetypetooltip>
+    </output>
+    <script>
+        <command reldir="extensions" interpreter="python">export_gcode.py</command>
+    </script>
+</inkscape-extension>
