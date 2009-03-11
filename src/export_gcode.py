@@ -908,7 +908,7 @@ class ExportGcode(inkex.Effect):
         else:
             mops.appendRapidMove(x=firstPoint.x, y=firstPoint.y)
         if self.options.useCutVariables:
-            mops.appendRapidMove(z="#2",f="#3")
+            mops.appendFeedMove(z="#2",f="#3")
         else:
             mops.appendFeedMove(z=cutZ, f=feedRate) 
         #Now output all the line paths (all at the same cut depth)
