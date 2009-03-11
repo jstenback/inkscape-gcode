@@ -9,6 +9,7 @@ I would also like to add a target for packaging a release archive (maybe gz and 
     </description>
 	<!-- set global properties for this build -->
 	<property name="src" location="src" />
+	<property name="dist" location="dist" />
 	<property name="inkscape-files" location="inkscape-files" />
 	<property name="inkscape" location="C:/Program Files/Inkscape" />
 
@@ -44,6 +45,25 @@ I would also like to add a target for packaging a release archive (maybe gz and 
 				<include name="simpletransform.py" />
 			</fileset>
 		</copy>
+	</target>
+	<target name="dist" depends="init" description="Creates archive containing all required files for install">
+		<mkdir dir="${dist}" />
+		<zip destfile="${dist}\inkscape-gcode-${DSTAMP}-${TSTAMP}.zip">
+			<fileset dir="${src}">
+				<include name="export_gcode.py" />
+				<include name="export_gcode.inx" />
+				<include name="saveas_gcode.inx" />
+				<include name="biarc.py" />
+			</fileset>
+		</zip>
+		<tar destfile="${dist}\inkscape-gcode-${DSTAMP}-${TSTAMP}.tar.gz" compression="gzip">
+			<fileset dir="${src}">
+				<include name="export_gcode.py" />
+				<include name="export_gcode.inx" />
+				<include name="saveas_gcode.inx" />
+				<include name="biarc.py" />
+			</fileset>
+		</tar>
 	</target>
 
 	
