@@ -12,6 +12,12 @@ I would also like to add a target for packaging a release archive (maybe gz and 
 	<property name="dist" location="dist" />
 	<property name="inkscape-files" location="inkscape-files" />
 	<property name="inkscape" location="C:/Program Files/Inkscape" />
+	<fileset id="inkscape.extension-files" dir="${src}">
+		<include name="export_gcode.py" />
+		<include name="export_gcode.inx" />
+		<include name="saveas_gcode.inx" />
+		<include name="biarc.py" />
+	</fileset>
 
 	<target name="init">
 		<!-- Create the time stamp -->
@@ -20,12 +26,7 @@ I would also like to add a target for packaging a release archive (maybe gz and 
 
 	<target name="deploy" depends="init" description="Copy the files to the inkscape share/extension directory">
 		<copy todir="${inkscape}/share/extensions">
-			<fileset dir="${src}">
-				<include name="export_gcode.py" />
-				<include name="export_gcode.inx" />
-				<include name="saveas_gcode.inx" />
-				<include name="biarc.py" />
-			</fileset>
+			<fileset refid="inkscape.extension-files" />
 		</copy>
 	</target>
 	<target name="clean" depends="init" description="Deletes any .pyc files">
@@ -49,20 +50,10 @@ I would also like to add a target for packaging a release archive (maybe gz and 
 	<target name="dist" depends="init" description="Creates archive containing all required files for install">
 		<mkdir dir="${dist}" />
 		<zip destfile="${dist}\inkscape-gcode-${DSTAMP}-${TSTAMP}.zip">
-			<fileset dir="${src}">
-				<include name="export_gcode.py" />
-				<include name="export_gcode.inx" />
-				<include name="saveas_gcode.inx" />
-				<include name="biarc.py" />
-			</fileset>
+			<fileset refid="inkscape.extension-files" />
 		</zip>
 		<tar destfile="${dist}\inkscape-gcode-${DSTAMP}-${TSTAMP}.tar.gz" compression="gzip">
-			<fileset dir="${src}">
-				<include name="export_gcode.py" />
-				<include name="export_gcode.inx" />
-				<include name="saveas_gcode.inx" />
-				<include name="biarc.py" />
-			</fileset>
+			<fileset refid="inkscape.extension-files" />
 		</tar>
 	</target>
 
