@@ -43,6 +43,10 @@
 	      	name="useScaleVariables" 
 	      	type="boolean" 
 	      	_gui-text="Use variables to scale X and Y dimensions">false</param>
+	      <param 
+	      	name="rs274x" 
+	      	type="boolean" 
+	      	_gui-text="RS-274X Photoplotter Output">false</param>
 	    </page>
 	    <page name="help" _gui-text="Help">
 	      <param name="help_text" type="description">

@@ -40,6 +40,7 @@ logWarning = inkex.debug
 g_toolPath = "ToolPath"
 option_filenameBase = ""
 option_machineTolerance = 0.005
+option_rs274x = False
 option_traverseZ = 1.0
 option_defaultCutZ = -1.0
 option_defaultFeedRate  = 1.0
@@ -345,6 +346,83 @@ class GcodeOperationList(object):
         self.lines.append( "#%i=%.4f (%s)" % (index, defaultValue, comment) )
 
 
+class GcodeRS274xOperationList(object):        
+    def __init__(self):
+        self.lines = []
+	# Common preamble
+	self.lines.append("%FSLAX24Y24*%")
+	self.lines.append("%MOIN*%")
+	self.lines.append("%ADD10C,0.005000*%")
+	self.lines.append("G04 Created by export_gcode.py Inkscape extension*")
+	self.lines.append("G04 Absolute positioning*")
+	self.lines.append("G90*")
+	self.lines.append("G04 Select default tool D10*")
+	self.lines.append("G54D10*")
+
+    def appendInstruction(self, code, **arguments):
+        line = code
+        argnames = arguments.keys()
+        argnames.sort()
+        for name in argnames : 
+            value = arguments[name]
+            if isinstance(value,basestring):
+                line +=  "%c%s" % (name[0].upper(),arguments[name])
+            else:
+                assert isinstance(value,float)
+                line +=  "%c%s" % (name[0].upper(),format(arguments[name]*10000," 07.0f").strip())
+	if code == 'G00':
+		line += 'D02' #rapid move with exposure off
+	elif code == 'G01':
+		line += 'D01' # milling with exposure on
+	elif code == 'G02':
+		line += 'D01' # arc with exposure on
+	elif code == 'G03':
+		line += 'D01' # arc with exposure on
+	line += '*' # append end of line
+        self.lines.append( line )
+        
+    def appendToolChange(self, tool):
+        self.lines.append("G54%s" % tool)
+
+    def appendEnd(self):
+	self.lines.append("M00*")
+        self.lines.append("M02*")
+
+    def appendMove(self, code, **arguments):
+	# Drop z movements and feed rates from photoplotter output
+	if 'z' in arguments:
+		del arguments['z']
+	if 'f' in arguments:
+		del arguments['f']
+	if len(arguments) != 0:
+		# skip the whole instruction if there is no motion to be done
+	        self.appendInstruction(code, **arguments)
+        
+    def appendRapidMove(self, **arguments):
+	self.appendMove("G00",**arguments)
+        
+    def appendFeedMove(self,**arguments):
+        self.appendMove("G01",**arguments)
+
+    def appendFeedArc(self,clockwise,**arguments):
+        if clockwise:
+            self.appendInstruction("G02",**arguments)
+        else:
+            self.appendInstruction("G03",**arguments)
+
+    def appendComment(self, comment):
+        self.lines.append( "G04 " + comment + "*" )
+        
+    def setUnitsToMillimeters(self):
+        self.lines.append("G04 All units in mm*")
+        self.lines.append("G71*")
+    def setUnitsToInches(self):
+        self.lines.append("G04 All units in inches*")
+        self.lines.append("G70*")
+    def defineVariable(self,index,defaultValue,comment):
+        self.lines.append( "#%i=%.4f (%s)" % (index, defaultValue, comment) )
+
+
 def calculateBounds(cutPath):
     assert cutPath.hasSegments()
     point = cutPath.segments[0].source
@@ -576,6 +654,10 @@ class ExportGcode(inkex.Effect):
                         action="store", type="string",
                         dest="filenameBase", default=option_filenameBase,
                         help="Base filename (layer names will be appended)")
+        self.OptionParser.add_option("--rs274x",
+                        action="store", type="inkbool",
+                        dest="rs274x", default=option_rs274x,
+                        help="Photoplotter Output (rs274x format)")
         self.OptionParser.add_option("--machineTolerance",
                         action="store", type="float",
                         dest="machineTolerance", default=option_machineTolerance,
@@ -748,6 +830,7 @@ class ExportGcode(inkex.Effect):
         # Currently only one converter is implemented, but a great thing would
         # be to develop a converter that goes from Beziers to Arcs (TBD).   
         logStage("Converting to GCode primitives...")
+	# TODO Implement a converter to eliminate the circles/convert to lines.
         for converter in converters:
             for cutList in cutLists:
                 for cutPath in cutList.cutPaths:
@@ -834,7 +917,12 @@ class ExportGcode(inkex.Effect):
         assert cutList.hasCutPaths()
         assert cutList.attributes.hasAttribute("Name")
         name = cutList.attributes.getAttribute("Name")
-        mops = GcodeOperationList()
+	
+	if self.options.rs274x:
+	        mops = GcodeRS274xOperationList()
+	else:
+		mops = GcodeOperationList()
+
         mops.appendComment("Found %i paths for %s:" % (len(cutList.cutPaths), name) )
         if units == "mm":
             mops.setUnitsToMillimeters()
