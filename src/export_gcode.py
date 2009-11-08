@@ -349,15 +349,15 @@ class GcodeOperationList(object):
 class GcodeRS274xOperationList(object):        
     def __init__(self):
         self.lines = []
-	# Common preamble
-	self.lines.append("%FSLAX24Y24*%")
-	self.lines.append("%MOIN*%")
-	self.lines.append("%ADD10C,0.005000*%")
-	self.lines.append("G04 Created by export_gcode.py Inkscape extension*")
-	self.lines.append("G04 Absolute positioning*")
-	self.lines.append("G90*")
-	self.lines.append("G04 Select default tool D10*")
-	self.lines.append("G54D10*")
+        # Common preamble
+        self.lines.append("%FSLAX24Y24*%")
+        self.lines.append("%MOIN*%")
+        self.lines.append("%ADD10C,0.005000*%")
+        self.lines.append("G04 Created by export_gcode.py Inkscape extension*")
+        self.lines.append("G04 Absolute positioning*")
+        self.lines.append("G90*")
+        self.lines.append("G04 Select default tool D10*")
+        self.lines.append("G54D10*")
 
     def appendInstruction(self, code, **arguments):
         line = code
@@ -370,36 +370,36 @@ class GcodeRS274xOperationList(object):
             else:
                 assert isinstance(value,float)
                 line +=  "%c%s" % (name[0].upper(),format(arguments[name]*10000," 07.0f").strip())
-	if code == 'G00':
-		line += 'D02' #rapid move with exposure off
-	elif code == 'G01':
-		line += 'D01' # milling with exposure on
-	elif code == 'G02':
-		line += 'D01' # arc with exposure on
-	elif code == 'G03':
-		line += 'D01' # arc with exposure on
-	line += '*' # append end of line
+        if code == 'G00':
+            line += 'D02' #rapid move with exposure off
+        elif code == 'G01':
+            line += 'D01' # milling with exposure on
+        elif code == 'G02':
+            line += 'D01' # arc with exposure on
+        elif code == 'G03':
+            line += 'D01' # arc with exposure on
+        line += '*' # append end of line
         self.lines.append( line )
         
     def appendToolChange(self, tool):
         self.lines.append("G54%s" % tool)
 
     def appendEnd(self):
-	self.lines.append("M00*")
+        self.lines.append("M00*")
         self.lines.append("M02*")
 
     def appendMove(self, code, **arguments):
-	# Drop z movements and feed rates from photoplotter output
-	if 'z' in arguments:
-		del arguments['z']
-	if 'f' in arguments:
-		del arguments['f']
-	if len(arguments) != 0:
-		# skip the whole instruction if there is no motion to be done
-	        self.appendInstruction(code, **arguments)
+        # Drop z movements and feed rates from photoplotter output
+        if 'z' in arguments:
+            del arguments['z']
+        if 'f' in arguments:
+            del arguments['f']
+        if len(arguments) != 0:
+            # skip the whole instruction if there is no motion to be done
+            self.appendInstruction(code, **arguments)
         
     def appendRapidMove(self, **arguments):
-	self.appendMove("G00",**arguments)
+        self.appendMove("G00",**arguments)
         
     def appendFeedMove(self,**arguments):
         self.appendMove("G01",**arguments)
@@ -501,8 +501,8 @@ class NullElementReader(AbstractElementReader):
 class LineElementReader(AbstractElementReader):
     def convertElementToPaths(self, element, coordinateTransformer):
         assert element.tag == inkex.addNS("line","svg")
-        startPoint = coordinateTransformer.convertPosition(node.get('x1'),node.get('y1') )
-        endPoint = coordinateTransformer.convertPosition(node.get('x1'),node.get('y1') )
+        startPoint = coordinateTransformer.convertPosition(element.get('x1'),element.get('y1') )
+        endPoint = coordinateTransformer.convertPosition(element.get('x2'),element.get('y2') )
         currentPath = CutPath()
         currentPath.appendSegment( StraightLineSegment( startPoint, endPoint ) )
         returnPaths = []
@@ -658,6 +658,7 @@ class ExportGcode(inkex.Effect):
                         action="store", type="inkbool",
                         dest="rs274x", default=option_rs274x,
                         help="Photoplotter Output (rs274x format)")
+        
         self.OptionParser.add_option("--machineTolerance",
                         action="store", type="float",
                         dest="machineTolerance", default=option_machineTolerance,
@@ -830,7 +831,7 @@ class ExportGcode(inkex.Effect):
         # Currently only one converter is implemented, but a great thing would
         # be to develop a converter that goes from Beziers to Arcs (TBD).   
         logStage("Converting to GCode primitives...")
-	# TODO Implement a converter to eliminate the circles/convert to lines.
+        # TODO Implement a converter to eliminate the circles/convert to lines.
         for converter in converters:
             for cutList in cutLists:
                 for cutPath in cutList.cutPaths:
@@ -917,11 +918,16 @@ class ExportGcode(inkex.Effect):
         assert cutList.hasCutPaths()
         assert cutList.attributes.hasAttribute("Name")
         name = cutList.attributes.getAttribute("Name")
-	
-	if self.options.rs274x:
-	        mops = GcodeRS274xOperationList()
-	else:
-		mops = GcodeOperationList()
+        
+        if self.options.rs274x:
+            mops = GcodeRS274xOperationList()
+            # change some of the defaults if rs274x is true
+            # If they are actually specified, that will override these defaults
+            self.options.returnToXYOrigin  = False
+            self.options.useCutVariables = False
+            self.options.useScaleVariables = False
+        else:
+            mops = GcodeOperationList()
 
         mops.appendComment("Found %i paths for %s:" % (len(cutList.cutPaths), name) )
         if units == "mm":
