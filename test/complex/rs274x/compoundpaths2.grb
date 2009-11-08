@@ -1,0 +1,29 @@
+%FSLAX24Y24*%
+%MOIN*%
+%ADD10C,0.005000*%
+G04 Created by export_gcode.py Inkscape extension*
+G04 Absolute positioning*
+G90*
+G04 Select default tool D10*
+G54D10*
+G04 Found 3 paths for AllObjects:*
+G04 All units in inches*
+G70*
+G04 Path has size 1.558 x 0.948*
+G04 Path has bounding box 2.269-3.827 wide by -5.486--4.538 high*
+G00X035326Y-045379D02*
+G01X038270Y-051554D01*
+G01X022689Y-054856D01*
+G01X035326Y-045379D01*
+G04 Path has size 1.357 x 2.183*
+G04 Path has bounding box 3.626-4.983 wide by -5.830--3.648 high*
+G00X043512Y-036475D02*
+G01X049830Y-058303D01*
+G01X036260Y-056580D01*
+G04 Path has size 2.470 x 1.034*
+G04 Path has bounding box 2.039-4.509 wide by -3.633--2.599 high*
+G00X020679Y-036332D02*
+G01X020392Y-030731D01*
+G01X045091Y-025992D01*
+M00*
+M02*

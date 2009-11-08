@@ -1,17 +1,18 @@
 <project name="inkscape-gcode" default="deploy" basedir=".">
 	<description>
 Simple build file to copy the working files into the Inkscape share/extension directory.
-	
-Note that this build file assumes a Windows OS, so can someone please clean this up for a unix 
-development environment.
-
-I would also like to add a target for packaging a release archive (maybe gz and zip).
     </description>
 	<!-- set global properties for this build -->
 	<property name="src" location="src" />
 	<property name="dist" location="dist" />
 	<property name="inkscape-files" location="inkscape-files" />
-	<property name="inkscape" location="C:/Program Files/Inkscape" />
+	
+	<available file="/usr/share/inkscape/extensions" type="dir" 
+		property="inkscape-extensions-dir" value="/usr/share/inkscape/extensions"/>
+	
+	<available file="C:/Program Files/Inkscape/share/extensions" type="dir" 
+		property="inkscape-extensions-dir" value="C:/Program Files/Inkscape/share/extensions"/>
+	
 	<fileset id="inkscape.extension-files" dir="${src}">
 		<include name="export_gcode.py" />
 		<include name="export_gcode.inx" />
@@ -25,7 +26,7 @@ I would also like to add a target for packaging a release archive (maybe gz and 
 	</target>
 
 	<target name="deploy" depends="init" description="Copy the files to the inkscape share/extension directory">
-		<copy todir="${inkscape}/share/extensions">
+		<copy todir="${inkscape-extensions-dir}">
 			<fileset refid="inkscape.extension-files" />
 		</copy>
 	</target>
@@ -37,7 +38,7 @@ I would also like to add a target for packaging a release archive (maybe gz and 
 	</target>
 	<target name="freshen-inkscape-files" depends="init" description="Updates local copy of inkscape files">
 		<copy todir="{inkscape-files}">
-			<fileset dir="${inkscape}/share/extensions">
+			<fileset dir="${inkscape-extensions-dir}">
 				<include name="bezmisc.py" />
 				<include name="cubicsuperpath.py" />
 				<include name="inkex.py" />
